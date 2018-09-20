@@ -1,2 +1,2 @@
-# pock
-A mock server
+# singlecmd-cli-template
+A single-command CLI template for dulu
