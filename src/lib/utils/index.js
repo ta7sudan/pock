@@ -14,6 +14,8 @@ exports.to = p => p.then(data => [null, data]).catch(err => [err, undefined]);
 
 exports.sleep = time => new Promise(rs => setTimeout(rs, time));
 
+exports.getAbsolutePath = rel => path.resolve(process.cwd(), rel);
+
 exports.getCmds = () => Object.keys(bin);
 
 exports.getFiglet = cmd =>

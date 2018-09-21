@@ -15,7 +15,14 @@
 			"request": "launch",
 			"name": "Entry debug",
 			"program": "${workspaceFolder}\\bin\\index.js",
-			"args": []
+			"args": [
+				// "--config",
+				// "c:/codes/demo/test.yml",
+				"-d",
+				"./",
+				// "--wechat",
+				// "/wechat"
+			]
 		}
 	]
 }

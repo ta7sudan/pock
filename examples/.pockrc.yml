@@ -1,0 +1,22 @@
+---
+# All of these properties are optional, but one of dirs, files,
+# proxy, wechat must be set.
+dirs: ./demo # string or Array<string>, default null
+files: ./test.js # string or Array<string>, default null
+proxy: www.baidu.com # string, default null
+to: 127.0.0.1:3000 # string, default current server
+wechat: # Object, default null
+  appid: abc # string, default null
+  secret: efg # string, default null
+  path: /wechat-config # string, default /wechat-config
+watch: true # boolean, default false
+host: 127.0.0.1 # string, default 0.0.0.0
+port: 3000 # string or number, default 3000
+cors: # boolean or Object, default false
+  allowMethods:
+    - 'PUT'
+    - 'DELETE'
+ssl: # Object, default null
+  cert: ./cert.pem # string, default null
+  key: ./key.pem # string, default null
+...
