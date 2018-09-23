@@ -30,6 +30,8 @@ function checkNodeVersion(wanted, cliName) {
 
 checkNodeVersion(wanted, getCmds()[0]);
 
+process.addListener('SIGHUP', handleExit);
+process.addListener('SIGQUIT', handleExit);
 process.addListener('SIGINT', handleExit);
 process.addListener('SIGTERM', handleExit);
 process.addListener('uncaughtException', handleError);
