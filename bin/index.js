@@ -10,7 +10,7 @@ const yaml = require('js-yaml');
 const fs = require('fs');
 const path = require('path');
 const {version, author} = require('../package');
-const {handleError, handleExit} = require('../src/lib/utils/error-handler');
+const {handleError, handleExit, handleSignal} = require('../src/lib/utils/error-handler');
 const {logger, getCmds, getFiglet, getAbsolutePath} = require('../src/lib/utils');
 const {
 	engines: {node: wanted}
@@ -30,11 +30,12 @@ function checkNodeVersion(wanted, cliName) {
 
 checkNodeVersion(wanted, getCmds()[0]);
 
-process.addListener('SIGHUP', handleExit);
-process.addListener('SIGQUIT', handleExit);
-process.addListener('SIGINT', handleExit);
-process.addListener('SIGTERM', handleExit);
+process.addListener('SIGHUP', handleSignal);
+process.addListener('SIGQUIT', handleSignal);
+process.addListener('SIGINT', handleSignal);
+process.addListener('SIGTERM', handleSignal);
 process.addListener('uncaughtException', handleError);
+process.addListener('exit', handleExit);
 
 (async () => {
 	/**

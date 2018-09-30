@@ -1,9 +1,14 @@
 'use strict';
 const {logger} = require('./index');
+const cleaner = require('./cleaner');
 
-function handleExit() {
+function handleSignal() {
 	logger.success('pock stopped.');
 	process.exit();
+}
+
+function handleExit() {
+	cleaner.cleanup();
 }
 
 function handleError(e) {
@@ -20,3 +25,5 @@ function handleError(e) {
 exports.handleError = handleError;
 
 exports.handleExit = handleExit;
+
+exports.handleSignal = handleSignal;

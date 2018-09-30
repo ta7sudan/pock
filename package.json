@@ -52,6 +52,7 @@
   },
   "dependencies": {
     "chalk": "^2.4.1",
+    "chokidar": "^2.0.4",
     "figlet": "^1.2.0",
     "figures": "^2.0.0",
     "js-yaml": "^3.12.0",
