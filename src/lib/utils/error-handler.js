@@ -1,6 +1,5 @@
 'use strict';
-const {logger} = require('./index');
-const cleaner = require('./cleaner');
+const {logger, cleaner} = require('./index');
 
 function handleSignal() {
 	logger.success('pock stopped.');

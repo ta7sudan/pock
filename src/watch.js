@@ -3,8 +3,7 @@ const chokidar = require('chokidar');
 const { fork } = require('child_process');
 const path = require('path');
 const fs = require('fs');
-const cleaner = require('./lib/utils/cleaner');
-const { logger, status: { ALREADY_START, INTERNAL_ERROR } } = require('./lib/utils');
+const { logger, cleaner, status: { ALREADY_START, INTERNAL_ERROR } } = require('./lib/utils');
 
 let child = null, killed = false, childISAlive = false, exitDueToSelf = false;
 
@@ -51,7 +50,7 @@ function startChildProcess(options, cwd) {
 		child.addListener('error', err => {
 			throw err;
 		});
-		child.addListener('exit', (code, signal) => {
+		child.addListener('exit', code => {
 			if (exitDueToSelf) {
 				cleaner.childIsAlive = false;
 				process.exit(code);
@@ -79,10 +78,10 @@ function startChildProcess(options, cwd) {
 
 function watch(options, cwd) {
 	let { dirs, files } = options; //, getPath = dir => path.resolve(cwd, dir);
-	dirs = (Array.isArray(dirs) ? dirs : typeof dirs === 'string' ? [dirs] : []).map(dir =>
-		path.join(dir, '**/*.(js|json|yml|yaml)')
+	dirs = [].concat(dirs).filter(dir => typeof dir === 'string').map(dir =>
+		path.join(dir, '**/*.{js,json,yml,yaml}')
 	);
-	files = Array.isArray(files) ? files : typeof files === 'string' ? [files] : [];
+	files = [].concat(files).filter(file => typeof file === 'string');
 
 	const target = [].concat(options.dirs || []).concat(files);
 	for (const dest of target) {
@@ -95,16 +94,18 @@ function watch(options, cwd) {
 
 	const watcher = chokidar.watch(dirs.concat(files), {
 		cwd,
-		ignored: 'node_modules'
+		ignored: ['**/node_modules', '**/.git']
 	});
 
 	cleaner.watcher = watcher;
 
 	watcher.on('ready', () => {
+		const handler = debounce(() => startChildProcess(options, cwd));
 		watcher
-			.on('add', debounce(() => startChildProcess(options, cwd)))
-			.on('change', debounce(() => startChildProcess(options, cwd)))
-			.on('unlink', debounce(() => startChildProcess(options, cwd)))
+			.on('add', handler)
+			.on('change', handler)
+			.on('unlink', handler)
+			.on('unlinkDir', handler)
 			.on('error', err => { throw err; });
 		startChildProcess(options, cwd);
 	});

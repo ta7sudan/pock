@@ -53,6 +53,11 @@
   "dependencies": {
     "chalk": "^2.4.1",
     "chokidar": "^2.0.4",
+    "fast-glob": "^2.2.3",
+    "fastify": "^1.12.1",
+    "fastify-cookie": "^2.0.2",
+    "fastify-cors": "^0.1.0",
+    "fastify-http-proxy": "^0.7.0",
     "figlet": "^1.2.0",
     "figures": "^2.0.0",
     "js-yaml": "^3.12.0",

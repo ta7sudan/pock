@@ -18,25 +18,29 @@ pock -P www.baidu.com -t 192.168.0.1:3000 # 代理www.baidu.com到192.168.0.1:30
 pock --wechat /wechat-config --appid aaa --secret bb # 微信授权
 ```
 
-考虑路由冲突的情况
+考虑路由冲突的情况, Done
 
-考虑端口被占用的情况, 参考http-server的处理
+看下哪些依赖是可以按需加载的, dulu 也看下
+
+检查下每个异常, log提示开头的大小写, 统一下, Done
+
+考虑端口被占用的情况, 参考http-server的处理, Done
 
 暂时不考虑代理服务器的https
 
 考虑代理采用DNS劫持还是流量劫持
 
-考虑路由404的情况
+考虑路由404的情况, Done
 
-考虑出现异常就不要自动重启了, 也许涉及进程通信
+考虑出现异常就不要自动重启了, 也许涉及进程通信, Done
 
 不允许对自己进行代理
 
-考虑下目录为空
+考虑下目录为空, Done
 
-考虑文件和目录中找不到一个controller或无法解析
+考虑文件和目录中找不到一个controller或无法解析, Done
 
-考虑让cors支持自定义头部, 参考https://github.com/koajs/cors
+考虑让cors支持自定义头部, 参考https://github.com/koajs/cors, Done
 
 ```
 --config [string] 可选, 不一定要指定文件, 默认找当前目录下的.pockrc.js/.pockrc.json/.pockrc.yml/.pockrc.yaml, 默认忽略其他所有选项

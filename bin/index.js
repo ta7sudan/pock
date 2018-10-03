@@ -76,18 +76,31 @@ process.addListener('exit', handleExit);
 				type: 'array'
 			},
 			P: {
-				alias: 'proxy',
-				desc: 'origin host:port',
+				alias: 'prefix',
+				desc: 'path/prefix for proxy, default /',
+				type: 'string',
+				coerce(val) {
+					return val === '' ? '/' : val;
+				}
+			},
+			u: {
+				alias: 'upstream',
+				desc: 'upstream for proxy',
+				type: 'string'
+			},
+			m: {
+				alias: 'mitm',
+				desc: 'target for mitm',
 				type: 'string'
 			},
 			t: {
 				alias: 'to',
-				desc: 'target host:port',
+				desc: 'dest for mitm, default current server address',
 				type: 'string'
 			},
 			wechat: {
 				desc:
-					'enable wechat js-sdk authorization and specify API path, eg. /wechat-config, default is /wechat-config. when --wechat is set, --appid and --secret is also required',
+					'enable wechat js-sdk authorization and specify API path, eg. /wechat-config, default /wechat-config. when --wechat is set, --appid and --secret is also required',
 				type: 'string',
 				coerce(val) {
 					return val === '' ? '/wechat-config' : val;
@@ -164,17 +177,17 @@ process.addListener('exit', handleExit);
 		})
 		.check(
 			({
-				config, dirs, files, proxy, to, wechat, appid, secret, watch, host, port, cors, ssl, cert, key
+				config, dirs, files, prefix, upstream, mitm, to, wechat, appid, secret, watch, host, port, cors, ssl, cert, key
 			}) => {
 				if (config === '') {
-					logger.error('Configuration must be set, and other options will be ignored.');
+					logger.error('Configuration must set, and other options will be ignored.');
 					return false;
 				}
 				if (
 					(config || pockrc) &&
 					[
-						dirs, files, proxy, to, wechat, appid, secret,
-						watch, host, port, cors, ssl, cert, key
+						dirs, files, prefix, upstream, mitm, to, wechat, appid, 
+						secret, watch, host, port, cors, ssl, cert, key
 					].some(v => typeof v !== 'undefined')
 				) {
 					logger.warn('Configuration is set, and other options will be ignored.');
@@ -186,22 +199,28 @@ process.addListener('exit', handleExit);
 					!config &&
 					(!dirs || !dirs.length) &&
 					(!files || !files.length) &&
-					!proxy &&
+					!upstream &&
+					!mitm &&
 					!wechat
 				) {
 					logger.error(
-						'One of --config, --dirs, --files, --proxy, --wechat must be set or have .pockrc file in current directory.'
+						'One of --config, --dirs, --files, --upstream, --mitm, --wechat must set or have .pockrc file in current directory.'
 					);
 					return false;
 				}
 
 				if (wechat && (!appid || !secret)) {
-					logger.error('--appid and secret also must be set.');
+					logger.error('--appid and secret also must set.');
 					return false;
 				}
 
 				if (ssl && (!cert || !key)) {
-					logger.error('--cert and --key also must be set.');
+					logger.error('--cert and --key also must set.');
+					return false;
+				}
+
+				if (upstream && mitm) {
+					logger.error('--upstream is conflict with --mitm');
 					return false;
 				}
 
@@ -210,8 +229,8 @@ process.addListener('exit', handleExit);
 		).argv;
 
 	const {
-			config, dirs, files, proxy, to, wechat, appid,
-			secret, watch, host, port, cors, ssl, cert, key
+			config, dirs, files, prefix, upstream, mitm, to, wechat,
+			appid, secret, watch, host, port, cors, ssl, cert, key
 		} = argv,
 		configuration = config ? getAbsolutePath(config) : pockrc;
 
@@ -241,19 +260,24 @@ process.addListener('exit', handleExit);
 			process.exit(1);
 		}
 
-		require('../src')(options, path.dirname(configuration));
+		await require('../src')(options, path.dirname(configuration));
 	} else {
-		require('../src')({
+		await require('../src')({
 			dirs,
 			files,
-			proxy,
-			to,
+			proxy: upstream ? {
+				prefix,
+				upstream
+			} : undefined,
+			mitm: mitm ? {
+				origin: mitm,
+				dest: to
+			} : undefined,
 			wechat: wechat ? {
 				appid,
 				secret,
 				path: wechat
-			}
-				: undefined,
+			} : undefined,
 			ssl: ssl ? {
 				cert,
 				key

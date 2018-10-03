@@ -3,8 +3,13 @@
 # proxy, wechat must be set.
 dirs: ./demo # string or Array<string>, default null
 files: ./test.js # string or Array<string>, default null
-proxy: www.baidu.com # string, default null
-to: 127.0.0.1:3000 # string, default current server
+proxy: # Object, default null
+  prefix: /api # string, default /
+  upstream: http://www.test.com # string, default null
+  http2: false # boolean, default false
+mitm: # Object, default null
+  origin: www.baidu.com # string, default null
+  dest: 127.0.0.1:3000 # string, default current server
 wechat: # Object, default null
   appid: abc # string, default null
   secret: efg # string, default null

@@ -4,8 +4,10 @@ const path = require('path');
 const os = require('os');
 const {bin} = require('../../../package');
 const logger = require('./logger');
+const cleaner = require('./cleaner');
 const status = require('./status');
 
+const oToString = Function.call.bind(Object.prototype.toString);
 const CLI_ROOT = path.resolve(__dirname, '../../..');
 const TODO_DIR = path.resolve(os.homedir(), '.todo');
 
@@ -36,6 +38,8 @@ exports.getFiglet = cmd =>
 		);
 	});
 
+exports.isObject = obj => oToString(obj) === '[object Object]';
+
 exports.logger = logger;
 
 exports.CLI_ROOT = CLI_ROOT;
@@ -43,3 +47,5 @@ exports.CLI_ROOT = CLI_ROOT;
 exports.TODO_DIR = TODO_DIR;
 
 exports.status = status;
+
+exports.cleaner = cleaner;

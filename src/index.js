@@ -1,18 +1,14 @@
 'use strict';
-const { logger } = require('./lib/utils');
+const { logger, cleaner } = require('./lib/utils');
 
-/**
- * TODO, 如果需要支持作为模块引入, 那应当在这里考虑合适的异常处理和未捕获的
- * Promise 的处理方案
- */
-
-function main(options) {
+async function main(options) {
 	const { watch } = options;
 
 	if (!watch) {
 		logger.note('Starting server...');
 	}
-	require(watch ? './watch' : './server')(options, process.cwd());
+	const server = await require(watch ? './watch' : './server')(options, process.cwd());
+	cleaner.server = server;
 }
 
 module.exports = main;

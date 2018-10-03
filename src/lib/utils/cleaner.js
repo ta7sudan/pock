@@ -3,6 +3,7 @@
 const cleaner = {
 	watcher: null,
 	child: null,
+	server: null,
 	childIsAlive: false,
 	cleaned: false,
 	cleanup() {
@@ -11,6 +12,9 @@ const cleaner = {
 		}
 		if (this.childIsAlive && this.child && typeof this.child.kill === 'function') {
 			this.child.kill('SIGTERM');
+		}
+		if (this.server && typeof this.server.close === 'function') {
+			this.server.close();
 		}
 		this.cleaned = true;
 	}
