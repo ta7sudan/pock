@@ -173,13 +173,6 @@ async function routeLoader(app, {
 		return err;
 	});
 
-	app.ready(err => {
-		if (err) {
-			throw err;
-		}
-		logger.success(`All routes and plugins are ready.\n\n${chalk.yellow(app.printRoutes())}`);
-	});
-
 	registerRoutesAndPlugins(app, allFiles);
 
 }

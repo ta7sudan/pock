@@ -11,9 +11,16 @@ mitm: # Object, default null
   origin: www.baidu.com # string, default null
   dest: 127.0.0.1:3000 # string, default current server
 wechat: # Object, default null
-  appid: abc # string, default null
+  appId: abc # string, default null
   secret: efg # string, default null
   path: /wechat-config # string, default /wechat-config
+  method: post # string, default get
+  url: http://www.example.com/test # string, default current request url
+  debug: true # boolean, default false
+  timestamp: 12345 # integer, default Date.now()/1000
+  nonceStr: abcde # string, default random string
+  signature: xyz # string, default calculate value
+  jsApiList: [uploadImage, previewImage] # Array<string>, default []
 watch: true # boolean, default false
 host: 127.0.0.1 # string, default 0.0.0.0
 port: 3000 # string or number, default 3000

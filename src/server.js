@@ -3,7 +3,7 @@ const Fastify = require('fastify');
 const chalk = require('chalk');
 const fs = require('fs').promises;
 const path = require('path');
-const {logger, isObject} = require('./lib/utils');
+const { logger, isObject, sleep } = require('./lib/utils');
 
 
 async function run(
@@ -12,10 +12,18 @@ async function run(
 		files,
 		proxy,
 		proxy: {
+			prefix,
 			upstream
 		} = {},
 		mitm,
+		mitm: {
+			origin,
+			dest
+		} = {},
 		wechat,
+		wechat: {
+			path: apiPath = '/wechat-config'
+		} = {},
 		ssl,
 		ssl: { cert, key } = {},
 		host = '0.0.0.0',
@@ -53,6 +61,8 @@ async function run(
 
 	const app = Fastify(appOptions);
 
+	let corsEnabled = false, proxyEnabled = false, mockServerEnabled = false, mitmEnabled = false, wechatAuthEnabled = false;
+
 	// CORS, 考虑下要不要只给http server加不给代理加
 	if (cors === true || isObject(cors)) {
 		const corsOptions = isObject(cors) ? cors : {
@@ -62,7 +72,12 @@ async function run(
 			credentials: true,
 			maxAge: 7200
 		};
-		app.register(require('fastify-cors'), corsOptions);
+		app.register(require('fastify-cors'), corsOptions).after(err => {
+			if (err) {
+				throw err;
+			}
+			corsEnabled = true;
+		});
 	}
 
 	// Proxy
@@ -70,18 +85,33 @@ async function run(
 		if (typeof upstream !== 'string' || !upstream) {
 			throw new TypeError('upstream must set, such as http://www.example.com');
 		}
-		proxy.prefix = typeof proxy.prefix === 'string' && proxy.prefix ? proxy.prefix : '/';
-		app.register(require('fastify-http-proxy'), proxy);
+		proxy.prefix = typeof prefix === 'string' && prefix ? prefix : '/';
+		app.register(require('fastify-http-proxy'), proxy).after(err => {
+			if (err) {
+				throw err;
+			}
+			proxyEnabled = true;
+		});
 	}
 
 	// Mitm
 	if (mitm) {
-		app.register(require('./mitm'), mitm);
+		app.register(require('./mitm'), mitm).after(err => {
+			if (err) {
+				throw err;
+			}
+			mitmEnabled = true;
+		});
 	}
 
 	// Wechat auth
 	if (wechat) {
-		app.register(require('./wechat-auth'), wechat);
+		app.register(require('./wechat-auth'), wechat).after(err => {
+			if (err) {
+				throw err;
+			}
+			wechatAuthEnabled = true;
+		});
 	}
 
 	// Load routes
@@ -90,6 +120,11 @@ async function run(
 			dirs,
 			files,
 			cwd
+		}).after(err => {
+			if (err) {
+				throw err;
+			}
+			mockServerEnabled = true;
 		});
 	}
 
@@ -100,9 +135,31 @@ async function run(
 		}
 	});
 
+	app.setErrorHandler(async err => {
+		if (err.message.toLowerCase() !== 'not found') {
+			logger.error(err.message);
+			logger.error(err.stack);
+		}
+		return err;
+	});
 
 	// 如果抛出异常交给进程全局异常捕获
 	const addr = await app.listen(parseInt(port, 10), host);
+	if (mockServerEnabled) {
+		logger.success(`All custom routes and plugins are ready.\n\n${chalk.yellow(app.printRoutes())}`);
+	}
+	if (corsEnabled) {
+		logger.success('CORS enabled.');
+	}
+	if (proxyEnabled) {
+		logger.success(`Proxy enabled. From ${chalk.cyan.underline(new URL(prefix, addr).toString())} to ${chalk.cyan.underline(upstream)}`);
+	}
+	if (mitmEnabled) {
+		logger.success(`MITM enabled. From ${chalk.cyan.underline(origin)} to ${chalk.cyan.underline(dest)}`);
+	}
+	if (wechatAuthEnabled) {
+		logger.success(`Wechat js-sdk authorization enabled. API is ${chalk.cyan.underline(new URL(apiPath, addr).toString())}`);
+	}
 	logger.success(`Server listening on ${chalk.cyan.underline(addr)}`);
 
 	return app;

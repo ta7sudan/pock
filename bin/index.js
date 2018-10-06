@@ -100,13 +100,13 @@ process.addListener('exit', handleExit);
 			},
 			wechat: {
 				desc:
-					'enable wechat js-sdk authorization and specify API path, eg. /wechat-config, default /wechat-config. when --wechat is set, --appid and --secret is also required',
+					'enable wechat js-sdk authorization and specify API path, eg. /wechat-config, default /wechat-config. when --wechat is set, --appId and --secret is also required',
 				type: 'string',
 				coerce(val) {
 					return val === '' ? '/wechat-config' : val;
 				}
 			},
-			appid: {
+			appId: {
 				desc: 'wechat appid, valid when --wechat is set',
 				type: 'string'
 			},
@@ -160,7 +160,7 @@ process.addListener('exit', handleExit);
 				`${cmdName} -d <dir0> <dir1>\n  ` +
 				`${cmdName} -f <file0> <file1>\n  ` +
 				`${cmdName} -P <host:port> -t <host:port>\n  ` +
-				`${cmdName} --wechat [path] --appid <appid> --secret <secret>\n  ` +
+				`${cmdName} --wechat [path] --appId <appId> --secret <secret>\n  ` +
 				`${cmdName} --config <configuration>`
 		)
 		.version(version)
@@ -177,7 +177,7 @@ process.addListener('exit', handleExit);
 		})
 		.check(
 			({
-				config, dirs, files, prefix, upstream, mitm, to, wechat, appid, secret, watch, host, port, cors, ssl, cert, key
+				config, dirs, files, prefix, upstream, mitm, to, wechat, appId, secret, watch, host, port, cors, ssl, cert, key
 			}) => {
 				if (config === '') {
 					logger.error('Configuration must set, and other options will be ignored.');
@@ -186,7 +186,7 @@ process.addListener('exit', handleExit);
 				if (
 					(config || pockrc) &&
 					[
-						dirs, files, prefix, upstream, mitm, to, wechat, appid, 
+						dirs, files, prefix, upstream, mitm, to, wechat, appId, 
 						secret, watch, host, port, cors, ssl, cert, key
 					].some(v => typeof v !== 'undefined')
 				) {
@@ -209,8 +209,8 @@ process.addListener('exit', handleExit);
 					return false;
 				}
 
-				if (wechat && (!appid || !secret)) {
-					logger.error('--appid and secret also must set.');
+				if (wechat && (!appId || !secret)) {
+					logger.error('--appId and secret also must set.');
 					return false;
 				}
 
@@ -230,7 +230,7 @@ process.addListener('exit', handleExit);
 
 	const {
 			config, dirs, files, prefix, upstream, mitm, to, wechat,
-			appid, secret, watch, host, port, cors, ssl, cert, key
+			appId, secret, watch, host, port, cors, ssl, cert, key
 		} = argv,
 		configuration = config ? getAbsolutePath(config) : pockrc;
 
@@ -274,7 +274,7 @@ process.addListener('exit', handleExit);
 				dest: to
 			} : undefined,
 			wechat: wechat ? {
-				appid,
+				appId,
 				secret,
 				path: wechat
 			} : undefined,

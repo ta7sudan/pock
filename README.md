@@ -15,7 +15,7 @@ pock --config <file> # 指定配置文件, 配置文件和其他所有选项冲�
 pock -C -d <dir> # C --cors
 pock -S -C cert.pem -K key.pem -d <dir> # S --ssl, C --cert, K --key, 所有接口变为https
 pock -P www.baidu.com -t 192.168.0.1:3000 # 代理www.baidu.com到192.168.0.1:3000, P --proxy, t --to, -t的默认值是当前服务器的host和port
-pock --wechat /wechat-config --appid aaa --secret bb # 微信授权
+pock --wechat /wechat-config --appId aaa --secret bb # 微信授权
 ```
 
 考虑路由冲突的情况, Done
@@ -58,7 +58,7 @@ pock --wechat /wechat-config --appid aaa --secret bb # 微信授权
 -c, --cert [string] 配合-S, 必须指定文件
 -k, --key [string] 配合-S, 必须指定文件
 -t, --to [string] 可选, 不一定要指定host和port, 默认当前服务器地址
---appid [string] 配合--wechat, 必须指定appid
+--appId [string] 配合--wechat, 必须指定appId
 --secret [string] 配合--wechat, 必须指定secret
 --help
 --version
@@ -72,7 +72,7 @@ dirs: ./test # 可以是字符串, 也可以是数组, default null
 files: ./test.js # 可以是字符串, 也可以是数组, default null
 proxy: www.baidu.com # 字符串, default null
 wechat: # 对象, default null
-  appid: aaa # 字符串
+  appId: aaa # 字符串
   secret: bbb # 字符串
   path: /wechat-config # 可选, 字符串, default /wechat-config
 watch: true # boolean, default false
