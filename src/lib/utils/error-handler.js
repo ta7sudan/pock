@@ -2,12 +2,9 @@
 const {logger, cleaner} = require('./index');
 
 function handleSignal() {
+	cleaner.cleanup();
 	logger.success('pock stopped.');
 	process.exit();
-}
-
-function handleExit() {
-	cleaner.cleanup();
 }
 
 function handleError(e) {
@@ -17,12 +14,11 @@ function handleError(e) {
 		logger.error(e.message);
 	}
 	logger.error(e.stack);
+	cleaner.cleanup();
 	process.exit(1);
 }
 
 
 exports.handleError = handleError;
-
-exports.handleExit = handleExit;
 
 exports.handleSignal = handleSignal;

@@ -113,7 +113,7 @@ async function getTicket(accessToken, retryCount) {
 
 // MMP, 竟然没有个正常点的方式获取protocol
 function getProtocol(req) {
-	if (req.req.socket.encrypted) return 'https';
+	if (req.raw.socket.encrypted) return 'https';
 	const proto = req['X-Forwarded-Proto'] || '';
 	return proto ? proto.split(/\s*,\s*/)[0] : 'http';
 }
@@ -128,14 +128,14 @@ function routeHandler({
 	signature: sig,
 	jsApiList: jal
 }) {
-	return async (req, res) => {
+	return async req => {
 		/* eslint camelcase: 0 */
 		const accessToken = await getToken(appId, secret);
 		const jsTicket = await getTicket(accessToken);
 		const debug = dbg || false;
 		const timestamp = ts || Math.floor(Date.now() / 1000);
 		const nonceStr = ns || randomString(20);
-		const href = new URL(req.req.url, `${getProtocol(req)}://${req.req.hostname}`).toString();
+		const href = new URL(req.raw.url, `${getProtocol(req)}://${req.raw.hostname}`).toString();
 		const url =
 			(req.query.url && decodeURIComponent(req.query.url)) ||
 			(req.body && req.body.url && decodeURIComponent(req.body.url)) ||

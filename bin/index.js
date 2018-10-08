@@ -10,7 +10,7 @@ const yaml = require('js-yaml');
 const fs = require('fs');
 const path = require('path');
 const {version, author} = require('../package');
-const {handleError, handleExit, handleSignal} = require('../src/lib/utils/error-handler');
+const {handleError, handleSignal} = require('../src/lib/utils/error-handler');
 const {logger, getCmds, getFiglet, getAbsolutePath} = require('../src/lib/utils');
 const {
 	engines: {node: wanted}
@@ -35,7 +35,6 @@ process.addListener('SIGQUIT', handleSignal);
 process.addListener('SIGINT', handleSignal);
 process.addListener('SIGTERM', handleSignal);
 process.addListener('uncaughtException', handleError);
-process.addListener('exit', handleExit);
 
 (async () => {
 	/**
