@@ -2,13 +2,28 @@
 const { logger, cleaner } = require('./lib/utils');
 
 async function main(options) {
-	const { watch } = options;
+	const { watch, dirs, files, wechat, proxy, mitm } = options;
+	const hasMockServer = dirs || files || proxy || wechat, hasMitmProxy = mitm;
 
-	if (!watch) {
-		logger.note('Starting server...');
+	// 可以被作为API调用, 所以多做一次类型检查
+	if (!hasMockServer && !hasMitmProxy) {
+		throw new Error('One of dirs, files, proxy, mitm, wechat must set, but none was found.');
 	}
-	const server = await require(watch ? './watch' : './server')(options, process.cwd());
-	cleaner.server = server;
+
+	if (proxy && mitm) {
+		throw new Error('proxy is conflicted with mitm.');
+	}
+
+	if (hasMockServer) {
+		logger.note('Starting server...');
+		const server = await require(watch ? './watch' : './server')(options, process.cwd());
+		cleaner.server = server;
+	}
+
+	if (hasMitmProxy) {
+		const mitmProxy = await require('./mitm')(mitm);
+		cleaner.mitmProxy = mitmProxy;
+	}
 }
 
 module.exports = main;

@@ -40,7 +40,6 @@ process.addListener('uncaughtException', handleError);
 	/**
 	 * FOR DEBUG
 	 */
-	// await sleep(10000);
 	const cmdName = getCmds()[0],
 		logo = await getFiglet(cmdName);
 	yargs.logo = logo;
@@ -89,12 +88,12 @@ process.addListener('uncaughtException', handleError);
 			},
 			m: {
 				alias: 'mitm',
-				desc: 'target for mitm',
+				desc: 'origin for mitm, when --mitm is set, --to is also required',
 				type: 'string'
 			},
 			t: {
 				alias: 'to',
-				desc: 'dest for mitm, default current server address',
+				desc: 'dest for mitm, valid when --mitm is set',
 				type: 'string'
 			},
 			wechat: {
@@ -220,6 +219,11 @@ process.addListener('uncaughtException', handleError);
 
 				if (upstream && mitm) {
 					logger.error('--upstream is conflict with --mitm');
+					return false;
+				}
+
+				if (mitm && !to) {
+					logger.error('--to also must set.');
 					return false;
 				}
 

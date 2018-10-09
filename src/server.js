@@ -3,7 +3,7 @@ const Fastify = require('fastify');
 const chalk = require('chalk');
 const fs = require('fs').promises;
 const path = require('path');
-const { logger, isObject, sleep } = require('./lib/utils');
+const { logger, isObject } = require('./lib/utils');
 
 
 async function run(
@@ -14,11 +14,6 @@ async function run(
 		proxy: {
 			prefix,
 			upstream
-		} = {},
-		mitm,
-		mitm: {
-			origin,
-			dest
 		} = {},
 		wechat,
 		wechat: {
@@ -32,16 +27,6 @@ async function run(
 	},
 	cwd = process.cwd()
 ) {
-
-	// 可以被作为API调用, 所以多做一次类型检查
-	// await sleep(10000);
-	if (!dirs && !files && !proxy && !mitm && !wechat) {
-		throw new Error('One of dirs, files, proxy, mitm, wechat must set, but none was found.');
-	}
-
-	if (proxy && mitm) {
-		throw new Error('proxy is conflicted with mitm.');
-	}
 
 	let appOptions = {
 		bodyLimit: 10485760
@@ -61,7 +46,7 @@ async function run(
 
 	const app = Fastify(appOptions);
 
-	let corsEnabled = false, proxyEnabled = false, mockServerEnabled = false, mitmEnabled = false, wechatAuthEnabled = false;
+	let corsEnabled = false, proxyEnabled = false, mockServerEnabled = false, wechatAuthEnabled = false;
 
 	// CORS, 考虑下要不要只给http server加不给代理加
 	if (cors === true || isObject(cors)) {
@@ -94,15 +79,6 @@ async function run(
 		});
 	}
 
-	// Mitm
-	if (mitm) {
-		app.register(require('./mitm'), mitm).after(err => {
-			if (err) {
-				throw err;
-			}
-			mitmEnabled = true;
-		});
-	}
 
 	// Wechat auth
 	if (wechat) {
@@ -154,13 +130,11 @@ async function run(
 	if (proxyEnabled) {
 		logger.success(`Proxy enabled. From ${chalk.cyan.underline(new URL(prefix, addr).toString())} to ${chalk.cyan.underline(upstream)}`);
 	}
-	if (mitmEnabled) {
-		logger.success(`MITM enabled. From ${chalk.cyan.underline(origin)} to ${chalk.cyan.underline(dest)}`);
-	}
 	if (wechatAuthEnabled) {
 		logger.success(`Wechat js-sdk authorization enabled. API is ${chalk.cyan.underline(new URL(apiPath, addr).toString())}`);
 	}
 	logger.success(`Server listening on ${chalk.cyan.underline(addr)}`);
+
 
 	return app;
 }

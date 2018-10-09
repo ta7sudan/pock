@@ -10,6 +10,9 @@ proxy: # Object, default null
 mitm: # Object, default null
   origin: www.baidu.com # string, default null
   dest: 127.0.0.1:3000 # string, default current server
+  host: 127.0.0.1 # string, default 0.0.0.0
+  port: 8080 # string, default random
+  log: true # boolean, default false
 wechat: # Object, default null
   appId: abc # string, default null
   secret: efg # string, default null

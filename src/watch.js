@@ -33,8 +33,6 @@ function startChildProcess(options, cwd) {
 		if (killed) {
 			logger.note('Restarting server...');
 			killed = false;
-		} else {
-			logger.note('Starting server...');
 		}
 		child = fork(path.resolve(__dirname, './child.js'));
 		cleaner.child = child;
