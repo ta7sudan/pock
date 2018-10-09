@@ -79,12 +79,19 @@ async function mitm(options) {
 		logger.error(err.message);
 	});
 
+	// 什么傻屌操作???
+	let resolve = null;
+	const delayLog = new Promise(rs => resolve = rs);
 	server.listen(parseInt(port, 10), host, err => {
 		if (err) {
 			throw err;
 		}
-		logger.success(`MITM proxy listening on ${chalk.cyan.underline(`http://${host}:${port}`)} From ${chalk.cyan.underline(origin)} to ${chalk.cyan.underline(dest)}`);
+		resolve();
 	});
+
+	await delayLog;
+	logger.success(`MITM proxy listening on ${chalk.cyan.underline(`http://${host}:${port}`)} From ${chalk.cyan.underline(origin)} to ${chalk.cyan.underline(dest)}`);
+
 
 	return server;
 }
