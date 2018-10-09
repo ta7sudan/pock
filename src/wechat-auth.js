@@ -189,7 +189,7 @@ async function wechatAuth(
 
 	if (typeof method === 'string') {
 		method = method.toLowerCase();
-		if (!['get', 'post', 'put', 'patch', 'delete', 'head', 'options'].includes(method)) {
+		if (!['get', 'post', 'put', 'patch', 'delete', 'head', 'options', 'all'].includes(method)) {
 			method = 'get';
 		}
 	} else {

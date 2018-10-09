@@ -182,7 +182,7 @@ process.addListener('uncaughtException', handleError);
 					return false;
 				}
 				if (
-					(config || pockrc) &&
+					config &&
 					[
 						dirs, files, prefix, upstream, mitm, to, wechat, appId, 
 						secret, watch, host, port, cors, ssl, cert, key
@@ -191,6 +191,7 @@ process.addListener('uncaughtException', handleError);
 					logger.warn('Configuration is set, and other options will be ignored.');
 					wechat = null;
 					ssl = null;
+					mitm = null;
 				}
 				if (
 					!pockrc &&
@@ -239,7 +240,7 @@ process.addListener('uncaughtException', handleError);
 
 	let options = null;
 
-	if (configuration) {
+	if (config || (configuration && !dirs && !files && !wechat && !mitm && !upstream)) {
 		if (!fs.existsSync(configuration)) {
 			logger.error(`${configuration} not found.`);
 			process.exit(1);

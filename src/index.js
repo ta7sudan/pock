@@ -1,7 +1,7 @@
 'use strict';
 const { logger, cleaner } = require('./lib/utils');
 
-async function main(options) {
+async function main(options, cwd = process.cwd()) {
 	const { watch, dirs, files, wechat, proxy, mitm } = options;
 	const hasMockServer = dirs || files || proxy || wechat, hasMitmProxy = mitm;
 
@@ -16,7 +16,7 @@ async function main(options) {
 
 	if (hasMockServer) {
 		logger.note('Starting server...');
-		const server = await require(watch ? './watch' : './server')(options, process.cwd());
+		const server = await require(watch ? './watch' : './server')(options, cwd);
 		cleaner.server = server;
 	}
 
