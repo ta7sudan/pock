@@ -1,6 +1,6 @@
 {
   "name": "pock",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A mock server",
   "main": "src/index.js",
   "bin": {
