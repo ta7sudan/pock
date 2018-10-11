@@ -11,7 +11,7 @@ const fs = require('fs');
 const path = require('path');
 const {version, author} = require('../package');
 const {handleError, handleSignal} = require('../src/lib/utils/error-handler');
-const {logger, getCmds, getFiglet, getAbsolutePath} = require('../src/lib/utils');
+const { logger, getCmds, getFiglet, getAbsolutePath} = require('../src/lib/utils');
 const {
 	engines: {node: wanted}
 } = require('../package');
@@ -181,53 +181,49 @@ process.addListener('uncaughtException', handleError);
 					logger.error('Configuration must set, and other options will be ignored.');
 					return false;
 				}
-				if (
-					config &&
-					[
+				if (config) {
+					if ([
 						dirs, files, prefix, upstream, mitm, to, wechat, appId, 
 						secret, watch, host, port, cors, ssl, cert, key
-					].some(v => typeof v !== 'undefined')
-				) {
-					logger.warn('Configuration is set, and other options will be ignored.');
-					wechat = null;
-					ssl = null;
-					mitm = null;
-				}
-				if (
-					!pockrc &&
-					!config &&
-					(!dirs || !dirs.length) &&
-					(!files || !files.length) &&
-					!upstream &&
-					!mitm &&
-					!wechat
-				) {
+					].some(v => typeof v !== 'undefined')) {
+						logger.warn('Configuration is set, and other options will be ignored.');
+					}
+				} else if (dirs || files || upstream || mitm || wechat) {
+					if (dirs && !dirs.length) {
+						logger.error('--dirs must set correctly.');
+						return false;
+					}
+					
+					if (files && !files.length) {
+						logger.error('--files must set correctly.');
+						return false;
+					}
+
+					if (wechat && (!appId || !secret)) {
+						logger.error('--appId and secret also must set.');
+						return false;
+					}
+
+					if (ssl && (!cert || !key)) {
+						logger.error('--cert and --key also must set.');
+						return false;
+					}
+
+					if (upstream && mitm) {
+						logger.error('--upstream is conflict with --mitm');
+						return false;
+					}
+
+					if (mitm && !to) {
+						logger.error('--to also must set.');
+						return false;
+					}
+				} else if (!pockrc) {
 					logger.error(
 						'One of --config, --dirs, --files, --upstream, --mitm, --wechat must set or have .pockrc file in current directory.'
 					);
 					return false;
 				}
-
-				if (wechat && (!appId || !secret)) {
-					logger.error('--appId and secret also must set.');
-					return false;
-				}
-
-				if (ssl && (!cert || !key)) {
-					logger.error('--cert and --key also must set.');
-					return false;
-				}
-
-				if (upstream && mitm) {
-					logger.error('--upstream is conflict with --mitm');
-					return false;
-				}
-
-				if (mitm && !to) {
-					logger.error('--to also must set.');
-					return false;
-				}
-
 				return true;
 			}
 		).argv;
@@ -240,32 +236,7 @@ process.addListener('uncaughtException', handleError);
 
 	let options = null;
 
-	if (config || (configuration && !dirs && !files && !wechat && !mitm && !upstream)) {
-		if (!fs.existsSync(configuration)) {
-			logger.error(`${configuration} not found.`);
-			process.exit(1);
-		}
-
-		const ext = path.extname(configuration);
-
-		if (ext === '.js' || ext === '.json') {
-			options = require(configuration);
-		} else if (ext === '.yml' || ext === '.yaml') {
-			try {
-				options = yaml.safeLoad(fs.readFileSync(configuration, 'utf8'));
-			} catch (err) {
-				logger.error(err.message);
-				process.exit(1);
-			}
-		} else {
-			logger.error(
-				`Unexpected file type: ${configuration}. Extension of configuration must be .js, .json, .yml or .yaml.`
-			);
-			process.exit(1);
-		}
-
-		await require('../src')(options, path.dirname(configuration));
-	} else {
+	if (!config && (dirs || files || wechat || mitm || upstream)) {
 		await require('../src')({
 			dirs,
 			files,
@@ -291,5 +262,37 @@ process.addListener('uncaughtException', handleError);
 			port,
 			cors
 		});
+	} else if (config || pockrc) {
+		if (!fs.existsSync(configuration)) {
+			logger.error(`${configuration} not found.`);
+			process.exit(1);
+		}
+
+		const ext = path.extname(configuration);
+
+		if (ext === '.js' || ext === '.json') {
+			options = require(configuration);
+		} else if (ext === '.yml' || ext === '.yaml') {
+			try {
+				options = yaml.safeLoad(fs.readFileSync(configuration, 'utf8'));
+			} catch (err) {
+				logger.error(err.message);
+				process.exit(1);
+			}
+		} else {
+			logger.error(
+				`Unexpected file type: ${configuration}. Extension of configuration must be .js, .json, .yml or .yaml.`
+			);
+			process.exit(1);
+		}
+
+		await require('../src')(options, path.dirname(configuration));
+	} else {
+		// 理论上来讲不会到这里
+		logger.error(
+			'One of --config, --dirs, --files, --upstream, --mitm, --wechat must set or have .pockrc file in current directory.'
+		);
+		process.exit(1);
 	}
+
 })();
