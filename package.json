@@ -12,7 +12,7 @@
   },
   "scripts": {
     "lint": "eslint src bin test",
-    "format": "prettier --config .prettierrc.js --write src/**/*.js bin/**/*.js",
+    "format": "prettier --config .prettierrc.js --write src/**/*.js bin/**/*.js test/**/*.js",
     "inspect": "jsinspect src bin",
     "test": "echo todo",
     "prepare": "npm test"
@@ -33,11 +33,11 @@
   },
   "homepage": "https://github.com/ta7sudan/pock#readme",
   "files": [
-    "/bin",
-    "/src",
-    "/man",
-    "/docs",
-    "/examples"
+    "bin",
+    "src",
+    "man",
+    "docs",
+    "examples"
   ],
   "lint-staged": {
     "*.js": [
