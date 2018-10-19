@@ -73,6 +73,22 @@ process.addListener('uncaughtException', handleError);
 				desc: 'files of routes',
 				type: 'array'
 			},
+			s: {
+				alias: 'static',
+				desc: 'static resource directory',
+				type: 'string',
+				coerce(val) {
+					return val === '' ? process.cwd() : val;
+				}
+			},
+			x: {
+				alias: 'staticPrefix',
+				desc: 'path/prefix for static resource server, default /',
+				type: 'string',
+				coerce(val) {
+					return val === '' ? '/' : val;
+				}
+			},
 			P: {
 				alias: 'prefix',
 				desc: 'path/prefix for proxy, default /',
@@ -175,7 +191,7 @@ process.addListener('uncaughtException', handleError);
 		})
 		.check(
 			({
-				config, dirs, files, prefix, upstream, mitm, to, wechat, appId, secret, watch, host, port, cors, ssl, cert, key
+				config, dirs, files, static: staticDir, prefix, upstream, mitm, to, wechat, appId, secret, watch, host, port, cors, ssl, cert, key
 			}) => {
 				if (config === '') {
 					logger.error('Configuration must set, and other options will be ignored.');
@@ -183,12 +199,12 @@ process.addListener('uncaughtException', handleError);
 				}
 				if (config) {
 					if ([
-						dirs, files, prefix, upstream, mitm, to, wechat, appId, 
-						secret, watch, host, port, cors, ssl, cert, key
+						dirs, files, staticDir, prefix, upstream, mitm, to, wechat,
+						appId, secret, watch, host, port, cors, ssl, cert, key
 					].some(v => typeof v !== 'undefined')) {
 						logger.warn('Configuration is set, and other options will be ignored.');
 					}
-				} else if (dirs || files || upstream || mitm || wechat) {
+				} else if (dirs || files || staticDir || upstream || mitm || wechat) {
 					if (dirs && !dirs.length) {
 						logger.error('--dirs must set correctly.');
 						return false;
@@ -220,7 +236,7 @@ process.addListener('uncaughtException', handleError);
 					}
 				} else if (!pockrc) {
 					logger.error(
-						'One of --config, --dirs, --files, --upstream, --mitm, --wechat must set or have .pockrc file in current directory.'
+						'One of --config, --dirs, --files, --static, --upstream, --mitm, --wechat must set or have .pockrc file in current directory.'
 					);
 					return false;
 				}
@@ -229,17 +245,21 @@ process.addListener('uncaughtException', handleError);
 		).argv;
 
 	const {
-			config, dirs, files, prefix, upstream, mitm, to, wechat,
-			appId, secret, watch, host, port, cors, ssl, cert, key
+			config, dirs, files, static: staticDir, staticPrefix, prefix, upstream,
+			mitm, to, wechat, appId, secret, watch, host, port, cors, ssl, cert, key
 		} = argv,
 		configuration = config ? getAbsolutePath(config) : pockrc;
 
 	let options = null;
 
-	if (!config && (dirs || files || wechat || mitm || upstream)) {
+	if (!config && (dirs || files || staticDir || wechat || mitm || upstream)) {
 		await require('../src')({
 			dirs,
 			files,
+			static: staticDir ? {
+				root: staticDir,
+				prefix: staticPrefix
+			} : undefined,
 			proxy: upstream ? {
 				prefix,
 				upstream
@@ -290,7 +310,7 @@ process.addListener('uncaughtException', handleError);
 	} else {
 		// 理论上来讲不会到这里
 		logger.error(
-			'One of --config, --dirs, --files, --upstream, --mitm, --wechat must set or have .pockrc file in current directory.'
+			'One of --config, --dirs, --files, --static, --upstream, --mitm, --wechat must set or have .pockrc file in current directory.'
 		);
 		process.exit(1);
 	}

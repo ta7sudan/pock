@@ -1,7 +1,7 @@
 'use strict';
 const Fastify = require('fastify');
 const chalk = require('chalk');
-const fs = require('fs').promises;
+const { promises: fs, exists } = require('fs');
 const path = require('path');
 const { logger, isObject } = require('./lib/utils');
 
@@ -10,9 +10,14 @@ async function run(
 	{
 		dirs,
 		files,
+		static: staticServer,
+		static: {
+			root,
+			prefix: staticPrefix = '/'
+		} = {},
 		proxy,
 		proxy: {
-			prefix,
+			prefix = '/',
 			upstream
 		} = {},
 		wechat,
@@ -46,7 +51,7 @@ async function run(
 
 	const app = Fastify(appOptions);
 
-	let corsEnabled = false, proxyEnabled = false, mockServerEnabled = false, wechatAuthEnabled = false;
+	let corsEnabled = false, staticServerEnabled = false, proxyEnabled = false, mockServerEnabled = false, wechatAuthEnabled = false;
 
 	// CORS, 考虑下要不要只给http server加不给代理加
 	if (cors === true || isObject(cors)) {
@@ -62,6 +67,22 @@ async function run(
 				throw err;
 			}
 			corsEnabled = true;
+		});
+	}
+
+	if (staticServer) {
+		root = path.resolve(cwd, root);
+		if (!exists(root)) {
+			throw new Error(`${root} not found.`);
+		}
+		app.register(require('fastify-static'), {
+			root,
+			prefix: staticPrefix
+		}).after(err => {
+			if (err) {
+				throw err;
+			}
+			staticServerEnabled = true;
 		});
 	}
 
@@ -126,6 +147,9 @@ async function run(
 	}
 	if (corsEnabled) {
 		logger.success('CORS enabled.');
+	}
+	if (staticServerEnabled) {
+		logger.success(`Static resource host at ${chalk.cyan.underline(staticPrefix)}.`);
 	}
 	if (proxyEnabled) {
 		logger.success(`Proxy enabled. From ${chalk.cyan.underline(new URL(prefix, addr).toString())} to ${chalk.cyan.underline(upstream)}`);

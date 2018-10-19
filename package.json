@@ -58,6 +58,7 @@
     "fastify-cookie": "^2.0.2",
     "fastify-cors": "^0.1.0",
     "fastify-http-proxy": "^0.7.0",
+    "fastify-static": "^0.14.0",
     "figlet": "^1.2.0",
     "figures": "^2.0.0",
     "got": "^9.2.2",

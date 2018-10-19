@@ -75,7 +75,7 @@ function startChildProcess(options, cwd) {
 }
 
 function watch(options, cwd) {
-	let { dirs, files } = options; //, getPath = dir => path.resolve(cwd, dir);
+	let { dirs, files } = options;
 	dirs = [].concat(dirs).filter(dir => typeof dir === 'string').map(dir =>
 		path.join(dir, '**/*.{js,json,yml,yaml}')
 	);
