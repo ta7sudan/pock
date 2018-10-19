@@ -1,7 +1,7 @@
 'use strict';
 const Fastify = require('fastify');
 const chalk = require('chalk');
-const { promises: fs, exists } = require('fs');
+const { promises: fs, existsSync: exists } = require('fs');
 const path = require('path');
 const { logger, isObject } = require('./lib/utils');
 
