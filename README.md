@@ -143,6 +143,8 @@ value 可以是一个对象, 一个数组, 一个函数, 一个函数的数组. 
 * `--config` 指定配置文件, eg. `pock --config ./.pockrc.yml`
 * `-d, --dirs` 指定一个目录, pock 会递归地查找目录中的 `.js` `.json` `.yml` `.yaml` 文件并注册路由或插件
 * `-f, --files` 指定一个文件, 将其导出的内容注册为路由或插件
+* `-s, --static` 指定一个静态资源目录
+* `-x, --staticPrefix` 指定静态资源服务的 path, 默认 `/`
 * `-P, --prefix` 指定代理的 path, 参考 [fastify-http-proxy](https://github.com/fastify/fastify-http-proxy)
 * `-u, --upstream` 指定代理的 upstream, 参考 [fastify-http-proxy](https://github.com/fastify/fastify-http-proxy)
 * `-m, --mitm` 启动中间人代理, 指定要劫持的 Host, eg. `www.example.com:443`, 同时必须指定 `-t`
@@ -173,9 +175,12 @@ pock 支持配置文件, 默认查找当前目录下的 `.pockrc.js` `.pockrc.js
 ```yaml
 ---
 # 所有属性都是可选的, 但是 dirs, files,
-# proxy, wechat, mitm 中至少要设置一个
+# static, proxy, wechat, mitm 中至少要设置一个
 dirs: ./demo # string or Array<string>, default null
 files: ./test.js # string or Array<string>, default null
+static: # Object, default null
+  root: ./static # string, default cwd
+  prefix: /public # string, default /
 proxy: # Object, default null
   prefix: /api # string, default /
   upstream: http://www.test.com # string, default null
