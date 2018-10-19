@@ -3,6 +3,9 @@
 # proxy, wechat must be set.
 dirs: ./demo # string or Array<string>, default null
 files: ./test.js # string or Array<string>, default null
+static: # Object, default null
+  root: ./static # string, default cwd
+  prefix: /public # string, default /
 proxy: # Object, default null
   prefix: /api # string, default /
   upstream: http://www.test.com # string, default null
