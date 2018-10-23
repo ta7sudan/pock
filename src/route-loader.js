@@ -31,7 +31,7 @@ function loadFile(file) {
 			rst = require(file);
 		}
 	} catch (e) {
-		logger.warn(`An error occured when load ${chalk.underline(file)}, it will be ignored.`);
+		logger.warn(`An error occurred when load ${chalk.underline(file)}, it will be ignored.`);
 		logger.error(e.message);
 		rst = 'error';
 	}
@@ -168,7 +168,7 @@ async function routeLoader(app, {
 	app.setErrorHandler(async (err, req) => {
 		if (err.message.toLowerCase() !== 'not found') {
 			const { hostname, url } = req.raw;
-			logger.error(`An error occured when request ${chalk.cyan(hostname + url)}:\n${err.message}`);
+			logger.error(`An error occurred when request ${chalk.cyan(hostname + url)}:\n${err.message}`);
 		}
 		return err;
 	});
