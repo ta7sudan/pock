@@ -9,6 +9,8 @@ cache:
 script:
 - npm run lint
 - npm test
+after_success:
+- npm run coverage
 git:
   depth: 1
 notifications:
@@ -17,6 +19,7 @@ notifications:
     on_failure: always
 deploy:
   provider: npm
+  skip_cleanup: true
   email: ta7sudan@gmail.com
   api_key:
     secure: KRkL/Kq76epyBKUW5UjLfYVd4eFwvwkuj2R++YcVj2/JWq8Qb4MeYlRQojMiToWtsICoX8kg/36J8Ii9ExDbUV8ctPb4EoPxALsTbbwsuUTKBWVgUBErN5UciEt6PAwBbs9tjcrVZUgT4FY4snE2nRvFFuyvfWTS/fnct667wei00jhs+2f/EEjFTp2zdPkhkE2O2QWmOdiIqKOK46NzCyLWxK2g1V409SA/0JJJbLeVhu5U9MdD7vDcQPIhPPoiYLz5/XS/+SKGeV0iOoAEsf22/pQCePW1UTybOf5+xsO5eluGQYb8LlfoP9WFirKhq3/dneuEYz745x7Czquj8R1qTx4wAkVF2O/qH7rDo/EXILqNwOxdcgxiobBXvxT7Fo2CmZK059GNyt/D+XOUbIuJpjFwSqsXdaTuNI833ltVStJzgzG1jkWWLaneUZFt+4gqPSx2YsdRrlG4WWrxyPW/Aiz0kDWH2m0xcof1HjJv9yo4kgQqM85bo9CmA8aIEAVoW7EhUPcLHb4ICVaXVO4kwbpM3y09sv/VVB36+onSXImZPt6PK92DOCDW/lPfKTsfeFEYBqCTRRomoloa+2iA4Cl1Zi6+i8pa/X1nafWY83Kmks6xVfHFmhq6JC7xWhFFsedwjvwjv1ltzRloJlC6IY5Tu+mIslMxSJmsAZI=

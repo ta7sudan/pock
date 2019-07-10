@@ -59,3 +59,9 @@ typings/
 
 # next.js build output
 .next
+
+coverage.lcov
+.rpt2_cache
+test_cache
+dist
+types

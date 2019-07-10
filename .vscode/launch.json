@@ -14,12 +14,10 @@
 			"type": "node",
 			"request": "launch",
 			"name": "Entry debug",
-			"program": "${workspaceFolder}\\bin\\index.js",
+			"program": "${workspaceFolder}/dist/bin/index.js",
 			"args": [
-				// "--config",
-				// "c:/codes/demo/test.yml",
-				"-d",
-				"./",
+				"--config",
+				"c:/codes/demo/.pockrc.yml"
 				// "--wechat",
 				// "/wechat"
 			]

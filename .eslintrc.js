@@ -1,4 +1,5 @@
 module.exports = {
+  root: true,
 	env: {
 		es6: true,
 		node: true
@@ -11,6 +12,7 @@ module.exports = {
 		ecmaVersion: 2018
 	},
 	rules: {
+		'no-undef': 'error',
 		'no-console': 'off',
 		'no-debugger': 'off',
 		'no-extra-boolean-cast': 'off',
