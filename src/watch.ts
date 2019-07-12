@@ -2,7 +2,7 @@ import chokidar from 'chokidar';
 import { fork, ChildProcess } from 'child_process';
 import { resolve, posix } from 'path';
 import { existsSync } from 'fs';
-import { logger, cleaner, Status } from './lib/utils';
+import { logger, cleaner, Status, debounce } from './lib/utils';
 import { ServerOptions } from './server';
 
 let child: ChildProcess | null = null,
@@ -10,29 +10,6 @@ let child: ChildProcess | null = null,
 	childIsAlive = false,
 	exitDueToSelf = false;
 
-function debounce(
-	fn: (...args: any[]) => any,
-	delay: number = 100,
-	thisArg?: any
-): (...args: any[]) => any {
-	if (typeof fn !== 'function') {
-		throw new TypeError('fn is not a function.');
-	}
-	// 同样, 考虑到后面返回的函数会被频繁调用, 则f的初始化放外面比放里面要好
-	let handler: null | ReturnType<typeof setTimeout> = null;
-	const f = function($thisArg: any, $args?: any[]): void {
-		handler = null;
-		fn.apply($thisArg, $args!);
-	};
-	return function(this: any): any {
-		const args = arguments.length === 1 ? [arguments[0]] : Array.apply(null, arguments as any);
-
-		if (handler) {
-			clearTimeout(handler);
-		}
-		handler = setTimeout(f, delay, thisArg || this, args);
-	};
-}
 
 function startChildProcess(options: ServerOptions, cwd: string): void {
 	// 如果有子进程则kill再重新启动

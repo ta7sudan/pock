@@ -134,6 +134,16 @@ function getProtocol(req: FastifyRequest): string {
 	return proto ? proto.split(/\s*,\s*/)[0] : 'http';
 }
 
+interface JSSDKConfig {
+	debug: boolean;
+	appId: string;
+	timestamp: number;
+	nonceStr: string;
+	signature: string;
+	jsApiList: string[];
+
+}
+
 function routeHandler({
 	appId,
 	secret,
@@ -143,8 +153,8 @@ function routeHandler({
 	nonceStr: ns,
 	signature: sig,
 	jsApiList: jal
-}: WechatOptions): (req: FastifyRequest) => Promise<any> {
-	return async (req: FastifyRequest): Promise<any> => {
+}: WechatOptions): (req: FastifyRequest) => Promise<JSSDKConfig> {
+	return async (req: FastifyRequest): Promise<JSSDKConfig> => {
 		const $accessToken = await getToken(appId, secret);
 		const $jsTicket = await getTicket($accessToken);
 		const debug = dbg || false;
